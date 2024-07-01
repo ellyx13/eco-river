@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./app
+    restart: always
+    command: uvicorn main:app --reload --workers 2 --host 0.0.0.0 --port 8004 --proxy-headers
+    volumes:
+      - ./app/:/opt/python-projects/app/
+    ports:
+      - "8004:8004"
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -s -f http://localhost:8004/v1/ping || exit 1"]
+      interval: 60s
+      timeout: 1s
+      retries: 3
+
+
+
