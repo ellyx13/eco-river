@@ -14,6 +14,26 @@ services:
       interval: 60s
       timeout: 1s
       retries: 3
+    depends_on:
+      - redis
+
+  worker:
+    build: ./worker
+    restart: always
+    command: python3 main.py
+    volumes:
+      - ./worker/:/opt/python-projects/app/
+    depends_on:
+      - redis
+ 
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - /cache/dаta:/root/redis
+
 
 
 
