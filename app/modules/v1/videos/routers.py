@@ -8,8 +8,9 @@ router = APIRouter(
 )
 
 
-@router.post("/videos", response_model=schemas.UploadVideoSuccessResponse, 
-             responses={413: {"model": schemas.VideoTooLargeResponse}})
+@router.post("/videos",  status_code=201, responses={
+            201: {'model': schemas.UploadVideoSuccessResponse},
+            413: {"model": schemas.VideoTooLargeResponse}})
 async def upload_video(file: UploadFile):
     await video_services.upload_video(file)
     return schemas.UploadVideoSuccessResponse()

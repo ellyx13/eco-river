@@ -4,3 +4,4 @@ typing
 pydantic
 redis
 aiofiles
+loguru

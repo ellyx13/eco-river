@@ -7,6 +7,8 @@ services:
     command: uvicorn main:app --reload --workers 2 --host 0.0.0.0 --port 8004 --proxy-headers
     volumes:
       - ./app/:/opt/python-projects/app/
+      - ./app/logs:/opt/python-projects/app/logs
+      - ./storages:/opt/python-projects/app/storages
     ports:
       - "8004:8004"
     healthcheck:
@@ -23,6 +25,8 @@ services:
     command: python3 main.py
     volumes:
       - ./worker/:/opt/python-projects/app/
+      - ./worker/logs:/opt/python-projects/app/logs
+      - ./storages:/opt/python-projects/app/storages
     depends_on:
       - redis
  

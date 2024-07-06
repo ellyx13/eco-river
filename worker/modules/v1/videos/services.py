@@ -1,11 +1,15 @@
 import os
-import json
 import aiofiles
-import config
+from . import config
 from io import BytesIO
+from loguru import logger
 
 def safe_open_file(path):
     os.makedirs(os.path.dirname(path), exist_ok=True)
+    
+def delete_file(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
 async def read_video(file_path):
     safe_open_file(file_path)
@@ -21,7 +25,9 @@ async def read_video(file_path):
 
 
 async def analyze_video(message):
-    message = json.loads(message)
-    file = await read_video(message['file_path'])
-    print(file.filename)
-    
+    try:
+        logger.info(f"(Video) Message Received: {message}")
+        file = await read_video(message['file_path'])
+    except Exception as exc:
+        logger.error(f'Analyze video {message["file_path"]} failed because error: {exc}')
+        delete_file(message['file_path'])
