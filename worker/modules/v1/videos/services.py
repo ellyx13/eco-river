@@ -28,6 +28,8 @@ async def analyze_video(message):
     try:
         logger.info(f"(Video) Message Received: {message}")
         file = await read_video(message['file_path'])
+
     except Exception as exc:
         logger.error(f'Analyze video {message["file_path"]} failed because error: {exc}')
-        delete_file(message['file_path'])
+        
+    delete_file(message['file_path'])
