@@ -4,3 +4,5 @@ typing
 pydantic
 redis
 aiofiles
+loguru
+httpx[http2]
