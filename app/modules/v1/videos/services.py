@@ -8,6 +8,7 @@ import time
 from loguru import logger
 import random
 from utils import arequest
+import uuid
 
 def safe_open_file(path):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -23,14 +24,23 @@ async def write_file(file):
     return file_path
 
 
-async def upload_video(identifier, file: UploadFile):
+async def upload_video(file: UploadFile):
     file_path = await write_file(file)
     logger.info(f'File path: {file_path}')
-    await publisher.send_message(message={'file_path': file_path, 'identifier': identifier})
+    await publisher.send_message(message={'file_path': file_path})
+    result = {}
+    result['_id'] = str(uuid.uuid4())
+    result['status'] = 'success'
+    return result
+
+
+async def get_video(video_id: str, is_analyzed: bool = False):
+    results = {}
+    results['_id'] = video_id
     
-    
-    
-async def generate_fake_webhook(identifier, url_callback) -> schemas.AnalyzeFakeResponse:
+    if is_analyzed is False:
+        return results
+
     pollution_levels = ["Low", "Medium", "High"]
     items = {
         "Plastic Bottle": "Plastic",
@@ -53,14 +63,14 @@ async def generate_fake_webhook(identifier, url_callback) -> schemas.AnalyzeFake
     num_items = random.randint(1, 15)
     selected_items = random.sample(list(items.items()), num_items)
 
-    results = []
+    data = []
     total_score = 0
     
     for name, category in selected_items:
         score = random.randint(1, 10)
         seconds = random.randint(1, 600)
         total_score += score
-        results.append({'name':name, 'category':category, 'environment_score':score, 'seconds':seconds})
+        data.append({'name':name, 'category':category, 'environment_score':score, 'seconds':seconds})
     
     if total_score <= 20:
         pollution_level = "Low"
@@ -69,13 +79,13 @@ async def generate_fake_webhook(identifier, url_callback) -> schemas.AnalyzeFake
     else:
         pollution_level = "High"
     
-    data = {}
-    data['identifier'] = identifier
-    data['total_items'] = num_items
-    data['total_environment_score'] = total_score
-    data['environmental_pollution_level'] = pollution_level
-    data['results'] = results
-
-    await arequest.post(url=url_callback, json=data)
+    results = {}
+    results['_id'] = video_id
+    results['total_items'] = num_items
+    results['total_environment_score'] = total_score
+    results['environmental_pollution_level'] = pollution_level
+    results['results'] = data
+    return results
     
-    return data
+    
+    

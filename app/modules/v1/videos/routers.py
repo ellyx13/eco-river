@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile
+from fastapi.responses import JSONResponse
 from . import schemas
 from . import services as video_services
 
@@ -8,30 +9,30 @@ router = APIRouter(
 )
 
 
-@router.post("/videos/{identifier}",  status_code=201, responses={
+@router.post("/videos",  status_code=201, responses={
             201: {'model': schemas.UploadVideoSuccessResponse},
             413: {"model": schemas.VideoTooLargeResponse}})
-async def upload_video(identifier: str, file: UploadFile):
-    await video_services.upload_video(identifier, file)
-    return schemas.UploadVideoSuccessResponse()
+async def upload_video(file: UploadFile):
+    result = await video_services.upload_video(file)
+    return schemas.UploadVideoSuccessResponse(**result)
 
-
-@router.post("/videos/callback/webhook/fake",  status_code=201, responses={
-            201: {'model': schemas.AnalyzeFakeResponse}})
-async def generate_fake_webhook(identifier: str, url_callback: str):
+@router.get("/videos/{video_id}",  status_code=200, responses={
+            200: {'model': schemas.AnalyzedResponse},
+            202: {"model": schemas.NotYetAnalyzedResponse}})
+async def get_video(video_id: str, is_analyzed: bool = False):
     """
-    Generate and send a fake analyze video webhook payload.
+    Get the analysis results of the video.
 
-    This function creates a simulated payload for a webhook, including details
-    about various items, their environmental scores, and overall pollution levels.
-    The payload is sent to the specified callback URL using an asynchronous POST request.
+    This function will get the analysis results from the video. Depending on whether the video has been analyzed or not, two different results will be returned.
+
 
     Parameters:
-    identifier (str): A unique identifier for the webhook payload.
-    url_callback (str): The URL to which the webhook payload will be sent.
+    1. video_id (str): A unique video id.
+    2. is_analyzed (bool): If is_analyzed is False, the api will return un analyzed results. If is_analyzed is True, the api will return the analysis results of the video. This variable is used to let the frontend test the 2 results returned by the api.
 
     Returns:
-    schemas.AnalyzeFakeResponse: The generated payload data.
+    1. schemas.AnalyzeResponse: The generated payload data.
+    2. schemas.NotYetAnalyzedResponse: If the video is being analyzed, there are no results yet.
 
     The function performs the following steps:
     1. Defines possible pollution levels and item categories.
@@ -42,7 +43,8 @@ async def generate_fake_webhook(identifier: str, url_callback: str):
     6. Returns the payload data.
 
     Field Descriptions:
-    - identifier (str): A unique identifier for this particular webhook event.
+    - _id (str): A unique identifier for this particular webhook event.
+    - status(str): Done or processing.
     - total_items (int): The total number of items included in the webhook payload.
     - total_environment_score (int): The sum of the environment scores of all items.
     - environmental_pollution_level (str): The pollution level based on total_environment_score. 
@@ -57,13 +59,13 @@ async def generate_fake_webhook(identifier: str, url_callback: str):
         - seconds (int): The appearance time of the object in seconds.
         
     Example:
-        identifier = "12345"
-        url_callback = "http://example.com/webhook"
-        await generate_fake_webhook(identifier, url_callback)
+        video_id = "12345"
+        await get_video(video_id, is_analyzed)
 
     The payload data structure:
     {
-        'identifier': str,
+        '_id': str,
+        'status': str,
         'total_items': int,
         'total_environment_score': int,
         'environmental_pollution_level': str,
@@ -78,5 +80,8 @@ async def generate_fake_webhook(identifier: str, url_callback: str):
         ]
     }
     """
-    results = await video_services.generate_fake_webhook(identifier, url_callback)
-    return schemas.AnalyzeFakeResponse(**results)
+    results = await video_services.get_video(video_id, is_analyzed)
+    if is_analyzed is False:
+        response = schemas.NotYetAnalyzedResponse(**results).model_dump()
+        return JSONResponse(status_code=202, content=response)
+    return schemas.AnalyzedResponse(**results)

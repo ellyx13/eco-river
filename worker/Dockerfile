@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 # pull official base image
 FROM python:3.11-alpine
 
