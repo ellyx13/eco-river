@@ -1,4 +1,0 @@
-# This file specifies files and directories that will be ignored when using
-# gcloud commands that support specifying a source directory.
-
-logs/
