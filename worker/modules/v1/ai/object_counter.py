@@ -15,7 +15,7 @@ async def determine_category(trash_name):
     return 'unknown', config.categories["unknown"]["score"]
 
 
-async def analyze_video(file_path) -> list:
+async def analyze_video(file_path) -> dict:
     cap = cv2.VideoCapture(file_path)
     assert cap.isOpened(), "Error reading video file"
 
@@ -44,7 +44,24 @@ async def analyze_video(file_path) -> list:
                 result['category'], result['environment_score'] = await determine_category(names[0])
                 objects.update({track_id: result})
 
-    results = []
+    results = {}
+    results['status'] = 'done'
+    results['results'] = []
+    results['total_items'] = 0
+    results['total_environment_score'] = 0
+    
     for obj in objects.values():
-        results.append({'name': obj['name'], 'seconds': obj['frame']})
+        results['total_items'] += 1
+        results['total_environment_score'] += obj['environment_score']
+        results['results'].append({'name': obj['name'], 'seconds': obj['frame'], 'category': obj['category'], 'environment_score': obj['environment_score']})
+    
+    if results['total_environment_score'] <= 20:
+        pollution_level = "Low"
+    elif results['total_environment_score'] <= 30:
+        pollution_level = "Medium"
+    else:
+        pollution_level = "High"
+        
+    results['environmental_pollution_level'] = pollution_level
+    
     return results

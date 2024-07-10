@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Literal, List
+from typing import Literal, List, Optional
 
 
 class UploadVideoResponse(BaseModel):
@@ -27,10 +27,10 @@ class DetailAnalyzeResponse(BaseModel):
     environment_score: int
     seconds: int
     
-class AnalyzedResponse(BaseModel):
+class AnalyzeResponse(BaseModel):
     id: str = Field(alias='_id')
-    status: str = 'done'
-    total_items: int
-    total_environment_score: int
-    environmental_pollution_level: str # Low, Medium, High
-    results: List[DetailAnalyzeResponse]
+    status: str
+    total_items: Optional[int] = None
+    total_environment_score: Optional[int] = None
+    environmental_pollution_level: Optional[str] = None # Low, Medium, High
+    results: Optional[List[DetailAnalyzeResponse]] = None

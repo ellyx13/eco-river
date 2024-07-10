@@ -2,13 +2,13 @@ from fastapi import UploadFile
 import publisher
 import aiofiles
 import os
-from . import config, schemas
+from . import config
 from config import PROJECT_PATH
 import time
 from loguru import logger
 import random
-from utils import arequest
 import uuid
+from partners.v1.firebase.services import firebase_video_services
 
 def safe_open_file(path):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -21,26 +21,25 @@ async def write_file(file):
     async with aiofiles.open(file_path, 'wb') as out_file:
         while content := await file.read(config.CHUNK_SIZE):
             await out_file.write(content)
-    return file_path
+    return file_path, filename
 
 
 async def upload_video(file: UploadFile):
-    file_path = await write_file(file)
+    file_path, filename = await write_file(file)
     logger.info(f'File path: {file_path}')
-    await publisher.send_message(message={'file_path': file_path})
+    
+    data = {'filename': filename, 'status': 'processing'}
+    doc = await firebase_video_services.add(data=data)
+    await publisher.send_message(message={'file_path': file_path, 'document_id': doc.id})
     result = {}
-    result['_id'] = str(uuid.uuid4())
+    result['_id'] = doc.id
     result['status'] = 'success'
     return result
 
 
-async def get_video(video_id: str, is_analyzed: bool = False):
+async def generate_fake_data(video_id):
     results = {}
     results['_id'] = video_id
-    
-    if is_analyzed is False:
-        return results
-
     pollution_levels = ["Low", "Medium", "High"]
     items = {
         "Plastic Bottle": "Plastic",
@@ -81,11 +80,20 @@ async def get_video(video_id: str, is_analyzed: bool = False):
     
     results = {}
     results['_id'] = video_id
+    results['status'] = 'done'
     results['total_items'] = num_items
     results['total_environment_score'] = total_score
     results['environmental_pollution_level'] = pollution_level
     results['results'] = data
     return results
+
+
+async def get_video(video_id: str, is_analyzed: bool = False):
+    if is_analyzed is True:
+        return await generate_fake_data(video_id=video_id)
+    item = await firebase_video_services.get_by_id(document_id=video_id)
+    item['_id'] = video_id
+    return item
     
     
     

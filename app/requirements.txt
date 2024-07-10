@@ -6,3 +6,5 @@ redis
 aiofiles
 loguru
 httpx[http2]
+google-cloud-firestore
+firebase_admin

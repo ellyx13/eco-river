@@ -9,6 +9,7 @@ services:
       - ./app/:/opt/python-projects/app/
       - ./app/logs:/opt/python-projects/app/logs
       - ./storages:/opt/python-projects/app/storages
+      - ./credentials:/opt/python-projects/app/credentials
     ports:
       - "8007:8007"
     healthcheck:
@@ -27,6 +28,7 @@ services:
       - ./worker/:/opt/python-projects/app/
       - ./worker/logs:/opt/python-projects/app/logs
       - ./storages:/opt/python-projects/app/storages
+      - ./credentials:/opt/python-projects/app/credentials
     depends_on:
       - redis
  

@@ -17,8 +17,8 @@ async def upload_video(file: UploadFile):
     return schemas.UploadVideoSuccessResponse(**result)
 
 @router.get("/videos/{video_id}",  status_code=200, responses={
-            200: {'model': schemas.AnalyzedResponse},
-            202: {"model": schemas.NotYetAnalyzedResponse}})
+            200: {'model': schemas.AnalyzeResponse}
+        })
 async def get_video(video_id: str, is_analyzed: bool = False):
     """
     Get the analysis results of the video.
@@ -81,7 +81,4 @@ async def get_video(video_id: str, is_analyzed: bool = False):
     }
     """
     results = await video_services.get_video(video_id, is_analyzed)
-    if is_analyzed is False:
-        response = schemas.NotYetAnalyzedResponse(**results).model_dump()
-        return JSONResponse(status_code=202, content=response)
-    return schemas.AnalyzedResponse(**results)
+    return schemas.AnalyzeResponse(**results).model_dump(by_alias=True, exclude_none=True)

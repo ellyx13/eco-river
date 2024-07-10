@@ -1,3 +1,4 @@
 redis
-aiofiles
 loguru
+google-cloud-firestore
+firebase_admin
