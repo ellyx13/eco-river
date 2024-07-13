@@ -24,7 +24,8 @@ async def upload_video(file: UploadFile):
     return schemas.UploadVideoSuccessResponse(**result)
 
 @router.get("/videos/{video_id}",  status_code=200, responses={
-            200: {'model': schemas.AnalyzeResponse}
+            200: {'model': schemas.AnalyzeResponse},
+            404: {"model": schemas.VideoNotFoundResponse},
         })
 async def get_video(video_id: str, is_analyzed: bool = False):
     """

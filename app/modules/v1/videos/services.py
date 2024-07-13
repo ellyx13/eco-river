@@ -1,4 +1,4 @@
-from fastapi import UploadFile
+from fastapi import UploadFile, HTTPException
 import publisher
 import aiofiles
 import os
@@ -37,6 +37,14 @@ async def upload_video(file: UploadFile):
     return result
 
 
+
+def _generate_coordinates():
+    x1 = random.uniform(0, 700)  
+    y1 = random.uniform(0, 700)
+    x2 = random.uniform(0, 700)
+    y2 = random.uniform(0, 700)
+    return [x1, y1, x2, y2]
+
 async def generate_fake_data(video_id):
     results = {}
     results['_id'] = video_id
@@ -69,7 +77,8 @@ async def generate_fake_data(video_id):
         score = random.randint(1, 10)
         seconds = random.randint(1, 600)
         total_score += score
-        data.append({'name':name, 'category':category, 'environment_score':score, 'seconds':seconds})
+        boxes = _generate_coordinates()
+        data.append({'name':name, 'category':category, 'environment_score':score, 'seconds':seconds, 'boxes': boxes})
     
     if total_score <= 20:
         pollution_level = "Low"
@@ -92,6 +101,8 @@ async def get_video(video_id: str, is_analyzed: bool = False):
     if is_analyzed is True:
         return await generate_fake_data(video_id=video_id)
     item = await firebase_video_services.get_by_id(document_id=video_id)
+    if not item:
+        raise HTTPException(status_code=404, detail=f"Video with id {video_id} could not be found")
     item['_id'] = video_id
     return item
     

@@ -21,6 +21,8 @@ class VideoTooLargeResponse(BaseModel):
 class VideoTypeNotSupportedResponse(BaseModel):
     detail: str = 'Upload file type are not supported. Please upload the file type .avi, .mp4, .mpeg, .webm.'
     
+class VideoNotFoundResponse(BaseModel):
+    detail: str = 'Video with id {video_id} could not be found'
     
 class DetailAnalyzeResponse(BaseModel):
     name: str
