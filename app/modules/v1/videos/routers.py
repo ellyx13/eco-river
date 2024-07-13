@@ -1,6 +1,5 @@
-from fastapi import APIRouter, UploadFile
-from fastapi.responses import JSONResponse
-from . import schemas
+from fastapi import APIRouter, UploadFile, HTTPException
+from . import schemas, config
 from . import services as video_services
 
 router = APIRouter(
@@ -11,8 +10,16 @@ router = APIRouter(
 
 @router.post("/videos",  status_code=201, responses={
             201: {'model': schemas.UploadVideoSuccessResponse},
-            413: {"model": schemas.VideoTooLargeResponse}})
+            413: {"model": schemas.VideoTooLargeResponse},
+            415: {"model": schemas.VideoTypeNotSupportedResponse}})
 async def upload_video(file: UploadFile):
+    if file.content_type not in config.ALLOW_FILE_TYPE:
+        raise HTTPException(status_code=415 , detail="Upload file type are not supported. Please upload the file type .avi, .mp4, .mpeg, .webm.") 
+    
+    size = await file.read()
+    if len(size) > config.ALLOW_FILE_SIZE:
+        raise HTTPException(status_code=413, detail="File size is too big. Limit file is 50 MB.")
+
     result = await video_services.upload_video(file)
     return schemas.UploadVideoSuccessResponse(**result)
 

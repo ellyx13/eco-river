@@ -12,14 +12,13 @@ ENV PYTHONUNBUFFERED 1
 RUN set -eux \
     && apk add --no-cache --virtual .build-deps build-base \
     libressl-dev libffi-dev gcc musl-dev python3-dev \
-    ffmpeg \
     && pip install --upgrade pip setuptools wheel \
-    && rm -rf /root/.cache/pip
+    && rm -rf /root/.cache/pip \
+    && pip install --upgrade pip
 
 # copy requirements file
 COPY ./requirements.txt /opt/python-projects/app/requirements.txt
 
-RUN pip install --upgrade pip
 RUN pip install -r /opt/python-projects/app/requirements.txt
 
 # Install curl for healthcheck

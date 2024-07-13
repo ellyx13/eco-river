@@ -16,9 +16,10 @@ class NotYetAnalyzedResponse(BaseModel):
     status: str = 'processing'
     
 class VideoTooLargeResponse(BaseModel):
-    status_code: int = 413
-    status: str = 'failed'
-    message: str = 'Video too large'
+    detail: str = 'File size is too big. Limit file is 50 MB.'
+    
+class VideoTypeNotSupportedResponse(BaseModel):
+    detail: str = 'Upload file type are not supported. Please upload the file type .avi, .mp4, .mpeg, .webm.'
     
     
 class DetailAnalyzeResponse(BaseModel):
