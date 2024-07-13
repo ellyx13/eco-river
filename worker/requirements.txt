@@ -3,3 +3,4 @@ loguru
 google-cloud-firestore
 firebase_admin
 opencv-python==4.10.0.84
+lapx

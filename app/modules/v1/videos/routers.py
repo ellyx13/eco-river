@@ -64,6 +64,7 @@ async def get_video(video_id: str, is_analyzed: bool = False):
         - category (str): The category of the item (e.g., "Plastic").
         - environment_score (int): The environmental score of the item, ranging from 1 to 10.
         - seconds (int): The appearance time of the object in seconds.
+        - boxes (list): List of coordinates of 4 points x1, y1, x2, y2 of the object. 
         
     Example:
         video_id = "12345"
@@ -81,7 +82,8 @@ async def get_video(video_id: str, is_analyzed: bool = False):
                 'name': str,
                 'category': str,
                 'environment_score': int,
-                'seconds': int
+                'seconds': int,
+                'boxes': list
             },
             ...
         ]

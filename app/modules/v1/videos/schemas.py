@@ -27,6 +27,7 @@ class DetailAnalyzeResponse(BaseModel):
     category: str
     environment_score: int
     seconds: int
+    boxes: List[float]
     
 class AnalyzeResponse(BaseModel):
     id: str = Field(alias='_id')
