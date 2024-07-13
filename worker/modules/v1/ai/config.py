@@ -1,4 +1,4 @@
-
+from config import PROJECT_PATH
 
 
 categories = {
@@ -27,3 +27,7 @@ categories = {
             "score": 0
         }
     }
+
+
+
+MODEL_PATH = PROJECT_PATH + '/model.pt'

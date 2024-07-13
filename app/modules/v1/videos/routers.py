@@ -19,7 +19,7 @@ async def upload_video(file: UploadFile):
     size = await file.read()
     if len(size) > config.ALLOW_FILE_SIZE:
         raise HTTPException(status_code=413, detail="File size is too big. Limit file is 50 MB.")
-
+    await file.seek(0)
     result = await video_services.upload_video(file)
     return schemas.UploadVideoSuccessResponse(**result)
 

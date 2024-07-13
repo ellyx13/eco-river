@@ -2,7 +2,7 @@ import cv2
 from ultralytics import YOLO
 from . import config
 
-model = YOLO("bestv2.pt")
+model = YOLO(config.MODEL_PATH)
 
 
 async def determine_category(trash_name):

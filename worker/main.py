@@ -1,4 +1,4 @@
-import redis.asyncio as redis
+from redis import asyncio as redis
 import asyncio
 import config
 from modules.v1.videos import services as video_services
