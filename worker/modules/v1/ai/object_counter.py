@@ -21,14 +21,15 @@ async def analyze_video(file_path) -> dict:
     assert cap.isOpened(), "Error reading video file"
 
     objects = {}
-    frame_id = -1
     while cap.isOpened():
         # Read a frame from the video
         success, frame = cap.read()
         if not success:
             print("Video frame is empty or video processing has been successfully completed.")
             break
-        frame_id += 1
+        
+        current_time_msec = cap.get(cv2.CAP_PROP_POS_MSEC)
+        current_time_sec = round(current_time_msec / 1000, 1)
 
         # Run YOLOv8 tracking on the frame, persisting tracks between frames
         results = model.track(frame, persist=True, verbose=False)
@@ -41,7 +42,7 @@ async def analyze_video(file_path) -> dict:
         for idx, track_id in enumerate(track_ids, 0):
             if not objects.get(track_id):
                 result = {}
-                result['frame'] = frame_id
+                result['seconds'] = current_time_sec
                 result['name'] = names[0]
                 result['category'], result['environment_score'] = await determine_category(names[0])
                 box = boxes[idx]
@@ -58,7 +59,7 @@ async def analyze_video(file_path) -> dict:
     for obj in objects.values():
         results['total_items'] += 1
         results['total_environment_score'] += obj['environment_score']
-        results['results'].append({'name': obj['name'], 'seconds': obj['frame'], 'category': obj['category'], 'environment_score': obj['environment_score'], 'boxes': obj['boxes']})
+        results['results'].append({'name': obj['name'], 'seconds': obj['seconds'], 'category': obj['category'], 'environment_score': obj['environment_score'], 'boxes': obj['boxes']})
     
     if results['total_environment_score'] <= 20:
         pollution_level = "Low"
