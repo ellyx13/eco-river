@@ -3,8 +3,6 @@ from ultralytics import YOLO
 from . import config
 from loguru import logger
 
-model = YOLO(config.MODEL_PATH)
-
 
 async def determine_category(trash_name):
     trash_name_lower = trash_name.lower()
@@ -17,6 +15,7 @@ async def determine_category(trash_name):
 
 
 async def analyze_video(file_path) -> dict:
+    model = YOLO(config.MODEL_PATH)
     logger.info(f"Analyzing video {file_path}")
     cap = cv2.VideoCapture(file_path)
     assert cap.isOpened(), "Error reading video file"

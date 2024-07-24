@@ -15,13 +15,12 @@ def safe_open_file(path):
 
 
 async def write_file(file):
-    filename = str(int(time.time())) + '_' + file.filename
-    file_path = PROJECT_PATH + "/storages/videos/" + filename
+    file_path = PROJECT_PATH + "/storages/videos/" + str(int(time.time())) + '_' + file.filename
     safe_open_file(file_path)
     async with aiofiles.open(file_path, 'wb') as out_file:
         while content := await file.read(config.CHUNK_SIZE):
             await out_file.write(content)
-    return file_path, filename
+    return file_path, file.filename
 
 
 async def upload_video(file: UploadFile):

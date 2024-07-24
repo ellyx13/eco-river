@@ -22,5 +22,7 @@ async def analyze_video(message):
 
     except Exception as exc:
         logger.error(f'Analyze video {message["file_path"]} failed because error: {exc}')
+        data_update = {'status': 'error'}
+        await firebase_video_services.update_by_id(document_id=message['document_id'], data=data_update)
         
     delete_file(message['file_path'])
