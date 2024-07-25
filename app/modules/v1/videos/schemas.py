@@ -28,7 +28,7 @@ class DetailAnalyzeResponse(BaseModel):
     name: str
     category: str
     environment_score: int
-    seconds: int
+    seconds: float
     boxes: List[float]
     
 class AnalyzeResponse(BaseModel):
