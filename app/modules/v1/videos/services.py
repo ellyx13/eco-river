@@ -7,7 +7,6 @@ from config import PROJECT_PATH
 import time
 from loguru import logger
 import random
-import uuid
 from partners.v1.firebase.services import firebase_video_services
 
 def safe_open_file(path):
