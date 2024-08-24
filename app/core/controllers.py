@@ -31,7 +31,7 @@ class BaseControllers:
         self,
         query: dict = None,
         search: str = None,
-        search_in: list = None,
+        search_in: str = None,
         page: int = 1,
         limit: int = 20,
         fields_limit: list | str = None,

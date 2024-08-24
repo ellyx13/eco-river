@@ -63,6 +63,7 @@ class PaginationParams:
         self,
         request: Request,
         search: str = Query(None, description="Anything you want"),
+        search_in: str = Query(None, description="Field you want to search"),
         page: int = Query(default=1, gt=0),
         limit: int = Query(default=20, gt=0),
         fields: str = None,
@@ -71,6 +72,7 @@ class PaginationParams:
     ):
         self.query = dict(request.query_params)
         self.search = search
+        self.search_in = search_in
         self.page = page
         self.limit = limit
         self.fields = fields
