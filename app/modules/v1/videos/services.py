@@ -28,7 +28,7 @@ async def upload_video(file: UploadFile):
     logger.info(f'File path: {file_path}')
     
     data = {'filename': filename, 'status': 'processing'}
-    doc = await firebase_video_services.add(data=data)
+    doc = await firebase_video_services.save(data=data)
     await publisher.send_message(message={'file_path': file_path, 'document_id': doc.id})
     result = {}
     result['_id'] = doc.id

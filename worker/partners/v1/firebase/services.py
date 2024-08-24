@@ -3,12 +3,6 @@ from firebase_admin import credentials
 from firebase_admin import firestore_async
 from . import config
 
-
-
-
-
-
-
 class FirebaseServices:
     def __init__(self, credentials_file_path, collection) -> None:
         self.credentials_file_path = credentials_file_path
