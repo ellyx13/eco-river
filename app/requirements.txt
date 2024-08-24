@@ -8,3 +8,7 @@ loguru
 httpx[http2]
 google-cloud-firestore
 firebase_admin
+
+bcrypt==4.2.0
+python-jose==3.3.0
+python-dateutil==2.9.0.post0
