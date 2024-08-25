@@ -323,7 +323,7 @@ class BaseCRUD:
         Args:
             query (dict, optional): The query criteria for querying the collection.
             search (str): A string to search for in the search_in fields.
-            search_in (list, optional): A list of fields to search in if a search query is provided.
+            search_in (sre, optional): A fields to search in if a search query is provided.
             page (int, optional): The page number for pagination.
             limit (int, optional): The number of documents per page.
             fields_limit (list, optional): A list of field names to include in the results.
@@ -363,6 +363,7 @@ class BaseCRUD:
         # Execute the query and gather results
         documents = query_ref.stream()
         results = []
+        print(search_in)
         async for document in documents:
             doc_dict = document.to_dict()
             # Handle search functionality

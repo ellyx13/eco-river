@@ -5,14 +5,14 @@ from db.base import BaseCRUD
 from . import models, schemas
 
 
-class ProjectServices(BaseServices):
+class CameraServices(BaseServices):
     def __init__(self, service_name: str, crud: BaseCRUD = None) -> None:
         super().__init__(service_name, crud)
 
     async def create(self, data: schemas.CreateRequest, commons: CommonsDependencies) -> dict:
         data["created_by"] = self.get_current_user(commons=commons)
         data["created_at"] = self.get_current_datetime()
-        data_save = models.Projects(**data).model_dump()
+        data_save = models.Cameras(**data).model_dump()
         return await self.save(data=data_save)
 
     async def edit(self, _id: str, data: schemas.EditRequest, commons: CommonsDependencies) -> dict:
@@ -21,5 +21,5 @@ class ProjectServices(BaseServices):
         return await self.update_by_id(_id=_id, data=data)
 
 
-project_crud = BaseCRUD(collection="projects")
-project_services = ProjectServices(service_name="projects", crud=project_crud)
+camera_crud = BaseCRUD(collection="cameras")
+camera_services = CameraServices(service_name="task_routers", crud=camera_crud)

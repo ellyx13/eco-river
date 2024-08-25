@@ -4,11 +4,11 @@ from fastapi_restful.cbv import cbv
 from fastapi_restful.inferring_router import InferringRouter
 
 from . import schemas
-from .controllers import projects_controllers
+from .controllers import camera_controllers
 
 router = InferringRouter(
     prefix="/v1",
-    tags=["v1/projects"],
+    tags=["v1/cameras"],
 )
 
 
@@ -16,9 +16,9 @@ router = InferringRouter(
 class RoutersCBV:
     commons: CommonsDependencies = Depends(CommonsDependencies)  # type: ignore
 
-    @router.get("/projects", status_code=200, responses={200: {"model": schemas.ListResponse, "description": "Get users success"}})
+    @router.get("/cameras", status_code=200, responses={200: {"model": schemas.ListResponse, "description": "Get users success"}})
     async def get_all(self, pagination: PaginationParams = Depends()):
-        results = await projects_controllers.get_all(
+        results = await camera_controllers.get_all(
             query=pagination.query,
             search=pagination.search,
             search_in=pagination.search_in,
@@ -33,24 +33,24 @@ class RoutersCBV:
             return results
         return schemas.ListResponse(**results)
 
-    @router.get("/projects/{_id}", status_code=200, responses={200: {"model": schemas.Response, "description": "Get users success"}})
+    @router.get("/cameras/{_id}", status_code=200, responses={200: {"model": schemas.Response, "description": "Get users success"}})
     async def get_detail(self, _id: ObjectIdStr, fields: str = None):
-        results = await projects_controllers.get_by_id(_id=_id, fields_limit=fields, commons=self.commons)
+        results = await camera_controllers.get_by_id(_id=_id, fields_limit=fields, commons=self.commons)
         if fields:
             return results
         return schemas.Response(**results)
 
-    @router.post("/projects", status_code=201, responses={201: {"model": schemas.Response, "description": "Register user success"}})
+    @router.post("/cameras", status_code=201, responses={201: {"model": schemas.Response, "description": "Register user success"}})
     async def create(self, data: schemas.CreateRequest):
-        result = await projects_controllers.create(data=data, commons=self.commons)
+        result = await camera_controllers.create(data=data, commons=self.commons)
         return schemas.Response(**result)
 
-    @router.put("/projects/{_id}", status_code=200, responses={200: {"model": schemas.Response, "description": "Update user success"}})
+    @router.put("/cameras/{_id}", status_code=200, responses={200: {"model": schemas.Response, "description": "Update user success"}})
     async def edit(self, _id: ObjectIdStr, data: schemas.EditRequest):
-        results = await projects_controllers.edit(_id=_id, data=data, commons=self.commons)
+        results = await camera_controllers.edit(_id=_id, data=data, commons=self.commons)
         return schemas.Response(**results)
 
-    @router.delete("/projects/{_id}", status_code=204)
+    @router.delete("/cameras/{_id}", status_code=204)
     async def delete(self, _id: ObjectIdStr):
-        results = await projects_controllers.soft_delete_by_id(_id=_id, commons=self.commons)
+        results = await camera_controllers.soft_delete_by_id(_id=_id, commons=self.commons)
         return schemas.Response(**results)

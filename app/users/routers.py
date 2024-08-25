@@ -24,11 +24,10 @@ class RoutersCBV:
 
     @router.get("/users", status_code=200, responses={200: {"model": schemas.ListResponse, "description": "Get users success"}})
     async def get_all(self, pagination: PaginationParams = Depends()):
-        search_in = ["fullname", "email"]
         results = await user_controllers.get_all(
             query=pagination.query,
             search=pagination.search,
-            search_in=search_in,
+            search_in=pagination.search_in,
             page=pagination.page,
             limit=pagination.limit,
             fields_limit=pagination.fields,

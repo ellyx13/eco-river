@@ -3,10 +3,10 @@ from core.schemas import CommonsDependencies
 from core.services import BaseServices
 
 from . import schemas
-from .services import project_services
+from .services import camera_services
 
 
-class ProjectControllers(BaseControllers):
+class CameraControllers(BaseControllers):
     def __init__(self, controller_name: str, service: BaseServices = None) -> None:
         super().__init__(controller_name, service)
 
@@ -20,4 +20,4 @@ class ProjectControllers(BaseControllers):
         return await self.service.edit(_id=_id, data=data, commons=commons)
 
 
-projects_controllers = ProjectControllers(controller_name="projects", service=project_services)
+camera_controllers = CameraControllers(controller_name="cameras", service=camera_services)
