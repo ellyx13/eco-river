@@ -2,6 +2,7 @@ import math
 import re
 from .firebase import firebase_engine
 from firebase_admin import firestore_async
+from google.cloud.firestore_v1.base_query import FieldFilter
 
 class BaseCRUD:
     def __init__(self, collection: str = None) -> None:
@@ -22,7 +23,7 @@ class BaseCRUD:
             for key, value in query.items():
                 query_ref = query_ref.where(key, '==', value)
 
-        documents = await query_ref.stream()
+        documents = query_ref.stream()
         return len([doc async for doc in documents])
 
     async def build_field_projection(self, fields_limit: list | str = None) -> list:
@@ -102,7 +103,7 @@ class BaseCRUD:
         Returns:
             str: The ID of the inserted document as a string.
         """
-        document_ref = await self.collection.add(data)
+        _, document_ref = await self.collection.add(data)
         return document_ref.id
 
 
@@ -121,8 +122,8 @@ class BaseCRUD:
 
         results = []
         for document in data:
-            document_ref = await self.collection.add(document)
-            results.append(document_ref.id)
+            document_id = await self.save(data=document)
+            results.append(document_id)
 
         return results if results else None
 
@@ -155,7 +156,7 @@ class BaseCRUD:
             raise ValueError("The type of unique_field must be list or str")
 
         # Check if any document exists with the given conditions
-        documents = await query_ref.stream()
+        documents = query_ref.stream()
         is_exist = any([True async for _ in documents])
 
         # If a document exists with the same unique_field values, do not save the new document and return False
@@ -272,7 +273,7 @@ class BaseCRUD:
             for key, value in query.items():
                 if result.get(key) != value:
                     return None  # Return None if the document doesn't match the query criteria
-
+        result['_id'] = _id
         return result
 
 
@@ -291,12 +292,12 @@ class BaseCRUD:
             dict | None: The retrieved document, or None if no document is found.
         """
         # Build the initial query based on the specified field and its value
-        query_ref = self.collection.where(field_name, '==', data)
+        query_ref = self.collection.where(filter=FieldFilter(field_name, "==", data))
 
         # If additional query criteria are provided, add them to the query
         if query:
             for key, value in query.items():
-                query_ref = query_ref.where(key, '==', value)
+                query_ref = query_ref.where(filter=FieldFilter(key, "==", value))
 
         # If fields_limit is provided, use select to limit the fields returned
         if fields_limit:
@@ -304,12 +305,13 @@ class BaseCRUD:
             query_ref = query_ref.select(*fields_limit)
 
         # Execute the query and get the document
-        documents = await query_ref.stream()
+        documents = query_ref.stream()
 
         # Fetch the first document that matches the query
         document = None
         async for doc in documents:
             document = doc.to_dict()
+            document['_id'] = doc.id
             break
         
         return document
@@ -332,6 +334,9 @@ class BaseCRUD:
         Returns:
             dict: A dictionary containing the results, total number of items, total pages, and records per page.
         """
+        common_params = {"search", "search_in", "page", "limit", "fields", "sort_by", "order_by"}
+        query = {k: v for k, v in (query or {}).items() if k not in common_params}
+        
         query_ref = self.collection
 
         # Handle additional query criteria
@@ -339,7 +344,7 @@ class BaseCRUD:
             for key, value in query.items():
                 query_ref = query_ref.where(key, '==', value)
 
-        # Handle sorting
+        # Handle sorting    
         if sort_by:
             order_by_direction = firestore_async.Query.DESCENDING if order_by == "desc" else firestore_async.Query.ASCENDING
             query_ref = query_ref.order_by(sort_by, direction=order_by_direction)
@@ -356,7 +361,7 @@ class BaseCRUD:
             query_ref = query_ref.limit(limit)
 
         # Execute the query and gather results
-        documents = await query_ref.stream()
+        documents = query_ref.stream()
         results = []
         async for document in documents:
             doc_dict = document.to_dict()

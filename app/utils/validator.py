@@ -15,7 +15,9 @@ def check_object_id(_id: str) -> bool:
     Returns:
         is_valid (bool): True if the string is a valid ObjectId, False otherwise.
     """
-    if ObjectId.is_valid(_id):
+    pattern = DataFormat.DOCUMENT_ID.value
+    print(re.match(pattern, _id))
+    if re.match(pattern, _id):
         return True
     return False
 

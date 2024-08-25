@@ -1,7 +1,8 @@
 
-
+        
 class CustomException(Exception):
-    def __init__(self, status_code:int, status: str, message: str):
-        self.status_code = status_code
+    def __init__(self, type: str, title: str, status: int, detail: str):
+        self.type = type
         self.status = status
-        self.message = message
+        self.title = title
+        self.detail = detail

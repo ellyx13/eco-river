@@ -6,8 +6,8 @@ PUBLIC_APIS = [
     "/openapi.json",
     "/redoc",
     "/v1/health/ping",
-    "/v2/users/register",
-    "/v2/users/login",
+    "/v1/users/register",
+    "/v1/users/login",
 ]
 
 

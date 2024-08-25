@@ -12,6 +12,8 @@ services:
       - ./credentials:/opt/python-projects/app/credentials
     ports:
       - "8007:8007"
+    env_file:
+      - ./.env/api.env
     healthcheck:
       test: ["CMD", "sh", "-c", "curl -s -f http://localhost:8007/v1/ping || exit 1"]
       interval: 60s

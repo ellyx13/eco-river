@@ -5,7 +5,6 @@ from fastapi import Query, Request
 from pydantic.functional_validators import AfterValidator
 from utils import validator
 from utils.value import OrderBy
-
 from .exceptions import ErrorCode as CoreErrorCode
 
 
@@ -28,9 +27,14 @@ class CommonsDependencies:
     """
 
     def __init__(self, request: Request) -> None:
-        self.current_user = request.state.payload.get("user_id")
-        self.user_type = request.state.payload.get("user_type")
-        self.is_public_api = request.state.payload.get("is_public_api")
+        self.current_user = None
+        self.user_type = None
+        self.is_public_api = None
+        if hasattr(request.state, "payload"):
+            self.current_user =  request.state.payload.get("user_id")
+            self.user_type = request.state.payload.get("user_type")
+            self.is_public_api = request.state.payload.get("is_public_api")
+            
 
 
 class PaginationParams:
