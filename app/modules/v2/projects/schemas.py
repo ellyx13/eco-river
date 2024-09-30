@@ -23,7 +23,7 @@ class Response(BaseModel):
     province: str
     country: str
     created_at: datetime
-    created_by: str
+    # created_by: str
 
 
 class ListResponse(BaseModel):

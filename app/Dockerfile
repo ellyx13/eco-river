@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.12-alpine
+FROM python:3.12-slim
 
 # set work directory
 WORKDIR /opt/python-projects/app
@@ -7,11 +7,10 @@ WORKDIR /opt/python-projects/app
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV OPENCV_FFMPEG_CAPTURE_OPTIONS rtsp_transport;udp
 
 # install dependencies
-RUN set -eux \
-    && apk add --no-cache --virtual .build-deps build-base \
-    libressl-dev libffi-dev gcc musl-dev python3-dev \
+RUN apt-get update && apt-get install -y iputils-ping telnet ffmpeg libsm6 libxext6 libssl-dev libffi-dev gcc musl-dev python3-dev \
     && pip install --upgrade pip setuptools wheel \
     && rm -rf /root/.cache/pip \
     && pip install --upgrade pip
@@ -22,7 +21,7 @@ COPY ./requirements.txt /opt/python-projects/app/requirements.txt
 RUN pip install -r /opt/python-projects/app/requirements.txt
 
 # Install curl for healthcheck
-RUN apk add curl
+RUN apt-get install -y curl
 
 # copy project
 COPY . /opt/python-projects/app/

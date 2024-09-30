@@ -1,8 +1,9 @@
 from core.schemas import CommonsDependencies, ObjectIdStr, PaginationParams
-from fastapi import Depends
+from fastapi import Depends, Response
 from fastapi_restful.cbv import cbv
 from fastapi_restful.inferring_router import InferringRouter
-
+from fastapi.responses import StreamingResponse
+import os
 from . import schemas
 from .controllers import camera_controllers
 
@@ -54,3 +55,31 @@ class RoutersCBV:
     async def delete(self, _id: ObjectIdStr):
         results = await camera_controllers.soft_delete_by_id(_id=_id, commons=self.commons)
         return schemas.Response(**results)
+
+    @router.get("/cameras/stream/{link}", status_code=200)
+    def stream(self, link: str):
+        return StreamingResponse(
+            camera_controllers.streaming_camera(link),
+            media_type='multipart/x-mixed-replace;boundary=frame'
+    )
+        
+    @router.get("/cameras/stream/{link}/objects", status_code=200, responses={200: {"model": schemas.ObjectListResponse, "description": "Update user success"}})
+    async def get_object(self, link: str):
+        results = await camera_controllers.get_object(link)
+        return schemas.ObjectListResponse(**results)
+    
+
+    def iterfile(self, file_path: str):
+        with open(file_path, mode="rb") as file_like:
+            while chunk := file_like.read(1024 * 1024):  # Đọc video theo chunk 1MB
+                yield chunk
+
+    @router.get("/test/stream", status_code=200)
+    async def main(self):
+        video_path = "/opt/python-projects/app/modules/v2/cameras/Kasm.mp4"  # Đảm bảo file tồn tại và đường dẫn đúng
+    
+        if not os.path.exists(video_path):
+            return Response(status_code=404, content="Video not found")
+
+        return StreamingResponse(self.iterfile(video_path), media_type="video/mp4")
+

@@ -8,8 +8,11 @@ from loguru import logger
 from config import PATH_LOGS
 import sys
 from middlewares.v1.authentication import AuthenticationMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
 
 
+load_dotenv()
 app = FastAPI(title='API Eco River')
 
 
@@ -21,7 +24,23 @@ logger.add(PATH_LOGS, colorize=False, format="<green>{time:YYYY-MM-DD HH:mm:ss.S
 app.include_router(api_router)
 
 # Middlewares
-app.add_middleware(AuthenticationMiddleware)
+# app.add_middleware(AuthenticationMiddleware)
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:8000",
+    "http://localhost:8007",
+    "http://localhost:3000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.exception_handler(CustomException)
 async def standard_exception_handler(request: Request, exc: CustomException):

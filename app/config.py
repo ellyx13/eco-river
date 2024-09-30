@@ -1,6 +1,6 @@
-TOPIC_VIDEO='video'
-PROJECT_PATH = '/opt/python-projects/app'
+PROJECT_PATH = r'P:\eco-river\app'
 
+TOPIC_VIDEO='video'
 
 # Log file path
-PATH_LOGS = "/opt/python-projects/app/logs/access.log"
+PATH_LOGS = r"P:\eco-river\app\logs\access.log"

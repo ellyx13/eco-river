@@ -1,10 +1,9 @@
-version: '3.8'
-
 services:
   api:
     build: ./app
     restart: always
     command: uvicorn main:app --reload --workers 2 --host 0.0.0.0 --port 8007 --proxy-headers
+    # command: uvicorn main:app --workers 2 --host 0.0.0.0 --port 8007 --proxy-headers
     volumes:
       - ./app/:/opt/python-projects/app/
       - ./app/logs:/opt/python-projects/app/logs
@@ -14,8 +13,32 @@ services:
       - "8007:8007"
     env_file:
       - ./.env/api.env
+    network_mode: "host"
     healthcheck:
       test: ["CMD", "sh", "-c", "curl -s -f http://localhost:8007/v1/ping || exit 1"]
+      interval: 60s
+      timeout: 1s
+      retries: 3
+    depends_on:
+      - redis
+
+  video:
+    build: ./app
+    restart: always
+    command: uvicorn main:app --workers 2 --host 0.0.0.0 --port 8008 --proxy-headers
+    # command: uvicorn main:app --workers 2 --host 0.0.0.0 --port 8007 --proxy-headers
+    volumes:
+      - ./app/:/opt/python-projects/app/
+      - ./app/logs:/opt/python-projects/app/logs
+      - ./storages:/opt/python-projects/app/storages
+      - ./credentials:/opt/python-projects/app/credentials
+    ports:
+      - "8008:8008"
+    env_file:
+      - ./.env/api.env
+    network_mode: "host"
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -s -f http://localhost:8008/v1/ping || exit 1"]
       interval: 60s
       timeout: 1s
       retries: 3

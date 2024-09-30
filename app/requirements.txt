@@ -18,3 +18,10 @@ pydantic-settings==2.4.0
 loguru==0.7.2
 fastapi-restful==0.6.0
 bson
+# opencv-contrib-python
+numpy
+opencv-python-headless
+imutils
+ultralytics
+lapx
+python-dotenv
